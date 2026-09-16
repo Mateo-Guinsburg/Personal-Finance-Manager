@@ -31,3 +31,5 @@ make
 [x] Table formatting: Used std::setw so the console displays expenses neatly aligned in columns.
 
 [x] Statistical Analysis: Added daily/weekly averages and key monthly metrics.
+
+Developed by Mateo Guinsburg.
