@@ -9,11 +9,11 @@ bool Expenditure::validate_amount(double amt){
 }
 
 bool Expenditure::validate_name(const std::string &name) {
-    return !name.empty();
+    return !name.empty() && name.find(',') == std::string::npos;
 }
 
 bool Expenditure::validate_type(const std::string &type) {
-    return !type.empty();
+    return !type.empty() && type.find(',') == std::string::npos;
 }
 
 bool Expenditure::validate_date(const std::string &date) {
@@ -27,7 +27,7 @@ bool Expenditure::validate_date(const std::string &date) {
     int days_in_month[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     int max_days = days_in_month[month - 1];
     if (month == 2 && ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0)) {
-        max_days = 29;  // Leap year February
+        max_days = 29;  //Leap year February
     }
     if (day < 1 || day > max_days) return false;
     return true;
@@ -37,8 +37,13 @@ std::string Expenditure::nowDate(){
     auto now = std::chrono::system_clock::now(); 
     std::time_t t = std::chrono::system_clock::to_time_t(now);
     std::tm tm{};
-    localtime_r(&t, &tm); 
-    //localtime_s(&tm, &t); //on Windows
+
+#ifdef _WIN32
+    localtime_s(&tm, &t); // Windows
+#else
+    localtime_r(&t, &tm); // Linux / macOS
+#endif
+
     char date[11];
     std::strftime(date, sizeof(date), "%d/%m/%Y", &tm);
     return std::string(date);
@@ -61,14 +66,14 @@ void Expenditure::setName(const std::string &name) {
     if (validate_name(name)) {
         this->name = name;
     } else {
-        throw std::invalid_argument("Invalid name: cannot be empty.");
+        throw std::invalid_argument("Invalid name: cannot be empty or contain commas.");
     }
 }
 void Expenditure::setType(const std::string &type) {
     if (validate_type(type)) {
         this->type = type;
     } else {
-        throw std::invalid_argument("Invalid type: cannot be empty.");
+        throw std::invalid_argument("Invalid type: cannot be empty or contain commas.");
     }
 }
 void Expenditure::setDate(const std::string &date) {
@@ -93,7 +98,7 @@ void Expenditure::show() const{
     std::ostringstream oss;
     oss << std::fixed << std::setprecision(2) << amount;
     std::cout << std::left << std::setw(20) << name 
-              << std::setw(8) << ("$" + oss.str()) 
+              << std::setw(11) << ("$" + oss.str()) 
               << std::setw(20) << type 
               << std::setw(12) << date << std::endl;
 }

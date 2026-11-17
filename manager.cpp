@@ -140,10 +140,10 @@ void Manager::showAll(){
     // Print header
     std::cout << std::left << std::setw(3) << "#" 
               << std::setw(20) << "Name" 
-              << std::setw(8) << "Amount" 
+              << std::setw(11) << "Amount" 
               << std::setw(20) << "Type" 
               << std::setw(12) << "Date" << std::endl;
-    std::cout << std::string(60, '-') << std::endl;  // Separator line
+    std::cout << std::string(66, '-') << std::endl;  // Separator line
     
     for(size_t i = 0; i < list.size(); i++){
         std::cout << std::left << std::setw(3) << (i + 1);
@@ -248,6 +248,9 @@ void Manager::loadFromFile(const std::string& filename) {
 }
 
 MonthlyStats Manager::getMonthlyStats(int month, int year) const {
+    if(month < 1 || month > 12 || year < 0){
+        throw std::invalid_argument("Invalid dates.");
+    }
     MonthlyStats stats = {0.0, 0.0, 0.0, 0.0, ""};
 
     for (size_t i = 0; i < list.size(); i++) {

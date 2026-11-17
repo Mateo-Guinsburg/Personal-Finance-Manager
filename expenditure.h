@@ -24,12 +24,12 @@ class Expenditure{
         //returns the systems' date
         static std::string nowDate();
 
-        //forces date to be DD/MM
+        //forces date to be DD/MM/YYYY
         static std::string formatDate(const std::string &rawDate);
     public:
         //full parameter constructor 
         Expenditure(const std::string &name, double amount, const std::string &type, const std::string &date)
-        :name(name), type(type), date(formatDate(date)){
+        :name(name), type(type){
              if (!validate_name(name)) {
                 throw std::invalid_argument("Invalid name: cannot be empty.");
             }
@@ -42,6 +42,7 @@ class Expenditure{
             if(validate_amount(amount)){
                 this->amount = amount;
             };
+            this->date = formatDate(date);
         }
         //automatically fills date
         Expenditure(const std::string &name, double amount, const std::string &type)

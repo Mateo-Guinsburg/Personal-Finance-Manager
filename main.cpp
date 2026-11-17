@@ -11,7 +11,7 @@ void handleEdit(Manager &M);
 void sortDate(Manager &M);
 void sortAmount(Manager &M);
 void sortType(Manager &M);
-size_t getOpt(size_t option);
+size_t getOpt();
 void filterDate(Manager &M);
 void filterAmount(Manager &M);
 void filterType(Manager &M);
@@ -41,7 +41,7 @@ void menu(){
         std::cout << "6. Show statistics by month" << std::endl;
         std::cout << "0. Exit" << std::endl;
         std::cout << "Your selection: ";
-        option = getOpt(option);
+        option = getOpt();
         if(option == 0) {
             std::cout << "Saving data..." << std::endl;
             M.saveToFile("data.csv");
@@ -57,7 +57,7 @@ void menu(){
                 std::cout << "\t3. Remove expenditure" << std::endl;
                 std::cout << "\n\t0. Back" << std::endl;
                 std::cout << "\nYour selection: ";
-                suboption = getOpt(suboption);
+                suboption = getOpt();
                 if(suboption == 0) break;
                 else if (suboption == 1) handleAdd(M);
                 else if (suboption == 2) handleEdit(M);
@@ -71,7 +71,7 @@ void menu(){
                 std::cout << "\t3. Sort by type (alphabetical)" << std::endl;
                 std::cout << "\n\t0. Back" << std::endl;
                 std::cout << "\nYour selection: ";
-                suboption = getOpt(suboption);
+                suboption = getOpt();
                 if(suboption == 0) break;
                 else if (suboption == 1) sortDate(M);
                 else if (suboption == 2) sortAmount(M);
@@ -87,7 +87,7 @@ void menu(){
                 std::cout << "\t5. Get total in a year" << std::endl;
                 std::cout << "\n\t0. Back" << std::endl;
                 std::cout << "\nYour selection: ";
-                suboption = getOpt(suboption);
+                suboption = getOpt();
                 if(suboption == 0) break;
                 else if (suboption == 1) getTotal(M);
                 else if (suboption == 2) getTotalDateRange(M);
@@ -103,7 +103,7 @@ void menu(){
                 std::cout << "\t3. Filter by type" << std::endl;
                 std::cout << "\n\t0. Back" << std::endl;
                 std::cout << "\nYour selection: ";
-                suboption = getOpt(suboption);
+                suboption = getOpt();
                 if(suboption == 0) break;
                 else if (suboption == 1) filterDate(M);
                 else if (suboption == 2) filterAmount(M);
@@ -160,7 +160,12 @@ void handleRemove(Manager &M){
     M.showAll();
     size_t userIdx, internalIdx;
     std::cout << "Insert the index of the expenditure requested to remove (or '0' to go back): ";
-    std::cin >> userIdx;
+    if(!(std::cin >> userIdx)){
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cout << "Invalid input." << std::endl;
+        return;
+    }
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     if(std::cin.fail()){
         std::cin.clear();
@@ -303,9 +308,13 @@ void sortType(Manager &M){
     M.showAll();
 }
 
-size_t getOpt(size_t option){
-    std::cin.clear();
-    std::cin >> option;
+size_t getOpt(){
+    size_t option;
+    if(!(std::cin >> option)){
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        return 99; //Invalid option so the menu reloads safely 
+    }
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     return option;
 }
@@ -414,7 +423,7 @@ void getTotalYear(Manager &M){
         std::cout << "Invalid input. Please enter a number." << std::endl;
         return;
     }
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Limpiar para futuros getlines
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //Clear buffer for future getlines
 
     try {
         std::cout << "\n=== Total amount spent in " << year << ": $" <<  M.getTotalByYear(year) << " ===\n";
